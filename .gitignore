@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.huggingface/
+results/
+uploads/
+*.bak_supabase
+.env
+.env.*

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}LUXE • Search{% endblock %}
+{% block content %}
+<section class="hero" style="padding-bottom:18px;">
+  <span class="eyebrow">Search workspace</span>
+  <h1 style="font-size:clamp(2rem,4vw,3.4rem)">Find visually similar fashion pieces.</h1>
+  <p>Use text or image search. Results render below with Supabase image links, dummy pricing, and quick save buttons.</p>
+</section>
+<section class="search-shell">
+  <aside class="panel search-form">
+    <form id="searchForm" enctype="multipart/form-data">
+      <div class="field">
+        <label class="label">Search method</label>
+        <select class="select" name="query_type" id="queryType">
+          <option value="text">Text search</option>
+          <option value="image">Image search</option>
+        </select>
+      </div>
+      <div class="field" id="textField">
+        <label class="label">Describe the style</label>
+        <input class="input" type="text" name="text_query" placeholder="black dress, white sneakers, blue shirt...">
+      </div>
+      <div class="field" id="imageField" style="display:none;">
+        <label class="label">Upload image</label>
+        <input class="input" type="file" name="image_query" accept="image/*">
+      </div>
+      <div class="field">
+        <label class="label">Result count</label>
+        <input class="input" type="number" name="k" value="6" min="1" max="12">
+      </div>
+      <button class="btn btn-primary" type="submit" style="width:100%;">Run search</button>
+    </form>
+  </aside>
+  <section>
+    <div class="results-head">
+      <h2>Results</h2>
+      <div id="statusText" class="badge">Waiting for query</div>
+    </div>
+    <div id="resultsWrap">
+      <div class="empty">No results yet. Submit a query to load your fashion matches here.</div>
+    </div>
+  </section>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const qType = document.getElementById('queryType');
+const textField = document.getElementById('textField');
+const imageField = document.getElementById('imageField');
+const form = document.getElementById('searchForm');
+const wrap = document.getElementById('resultsWrap');
+const statusText = document.getElementById('statusText');
+qType.addEventListener('change', ()=>{
+  textField.style.display = qType.value === 'text' ? 'block' : 'none';
+  imageField.style.display = qType.value === 'image' ? 'block' : 'none';
+});
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  statusText.textContent = 'Searching...';
+  wrap.innerHTML = '<div class="empty">Searching your index...</div>';
+  const res = await fetch('/search', {method:'POST', body:new FormData(form)});
+  const data = await res.json();
+  if(data.error){
+    statusText.textContent = 'Error';
+    wrap.innerHTML = `<div class="alert error">${data.error}</div>`;
+    return;
+  }
+  const results = data.results || [];
+  statusText.textContent = `${results.length} items`;
+  if(!results.length){
+    wrap.innerHTML = '<div class="empty">No matches found for this query.</div>';
+    return;
+  }
+  wrap.innerHTML = `
+    <div class="grid">
+      ${results.map(r => `
+        <article class="product-card">
+          <img src="${r.image_url}" alt="${r.category}" loading="lazy" onerror="this.src='https://placehold.co/600x800/f3f0ec/8c8b87?text=Image'">
+          <div class="body">
+            <div class="row">
+              <span class="match">${(parseFloat(r.similarity)*100).toFixed(1)}% match</span>
+              <button class="fav" onclick="saveFavorite('${r.image_url}', ${r.price}, '${r.category}', this)">♡</button>
+            </div>
+            <div class="price">
+              <span class="price-now">₹${Number(r.price).toLocaleString('en-IN')}</span>
+              <span class="price-old">₹${Number(r.original_price).toLocaleString('en-IN')}</span>
+              <span class="off">${r.discount}% OFF</span>
+            </div>
+            <p style="margin:0 0 10px;font-size:.92rem;word-break:break-all;">${r.image_url}</p>
+            <div class="links">
+              <a class="shop" target="_blank" rel="noopener noreferrer" href="${r.ecommerce_links.flipkart}">Flipkart</a>
+              <a class="shop" target="_blank" rel="noopener noreferrer" href="${r.ecommerce_links.amazon}">Amazon</a>
+              <a class="shop" target="_blank" rel="noopener noreferrer" href="${r.ecommerce_links.myntra}">Myntra</a>
+              <a class="shop" target="_blank" rel="noopener noreferrer" href="${r.ecommerce_links.ajio}">Ajio</a>
+            </div>
+          </div>
+        </article>`).join('')}
+    </div>`;
+});
+</script>
+{% endblock %}

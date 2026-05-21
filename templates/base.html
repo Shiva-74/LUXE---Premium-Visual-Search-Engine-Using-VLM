@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}LUXE Search{% endblock %}</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&f[]=boska@400,500,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --bg:#f7f6f2; --surface:#f9f8f5; --surface2:#fbfbf9; --surface3:#f0eee8;
+      --text:#28251d; --muted:#7a7974; --border:#d8d4cc; --primary:#01696f; --primary-2:#0c4e54;
+      --accent:#c58a1a; --danger:#a13544; --shadow:0 10px 30px rgba(40,37,29,0.08);
+      --radius:18px; --radius-sm:12px; --max:1200px;
+    }
+    [data-theme="dark"] {
+      --bg:#171614; --surface:#1c1b19; --surface2:#201f1d; --surface3:#262523;
+      --text:#cdccca; --muted:#8c8b87; --border:#393836; --primary:#4f98a3; --primary-2:#227f8b;
+      --accent:#e0aa42; --danger:#dd6974; --shadow:0 10px 30px rgba(0,0,0,0.35);
+    }
+    *{box-sizing:border-box} html,body{margin:0;padding:0} body{font-family:'Satoshi',sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+    a{text-decoration:none;color:inherit} img{display:block;max-width:100%}
+    .container{max-width:var(--max);margin:0 auto;padding:0 20px}
+    .site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .logo{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.08em}
+    .logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:var(--shadow);position:relative}
+    .logo-mark:before,.logo-mark:after{content:"";position:absolute;background:#fff;border-radius:999px;opacity:.9}
+    .logo-mark:before{width:8px;height:18px;left:9px;top:8px;transform:rotate(28deg)}
+    .logo-mark:after{width:8px;height:18px;right:9px;top:8px;transform:rotate(-28deg)}
+    .logo-text{font-family:'Boska',serif;font-size:1.3rem;letter-spacing:.06em}
+    .nav-links{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .nav-link,.theme-btn{padding:10px 14px;border-radius:999px;border:1px solid transparent;font-size:.95rem;color:var(--muted)}
+    .nav-link:hover,.nav-link.active,.theme-btn:hover{background:var(--surface2);border-color:var(--border);color:var(--text)}
+    .theme-btn{background:transparent;cursor:pointer}
+    .hero{padding:64px 0 28px}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:.8rem;color:var(--muted)}
+    h1,h2,h3{margin:0 0 12px} h1{font-family:'Boska',serif;font-size:clamp(2.5rem,5vw,4.6rem);line-height:1.02;letter-spacing:-.03em}
+    h2{font-family:'Boska',serif;font-size:clamp(1.6rem,3vw,2.4rem)} h3{font-size:1.08rem}
+    p{margin:0 0 12px;color:var(--muted)}
+    .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:stretch}
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .hero-copy{padding:28px}
+    .hero-copy p{max-width:58ch}
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 18px;border-radius:999px;border:1px solid var(--border);font-weight:600}
+    .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-2)}
+    .btn-secondary{background:var(--surface2)}
+    .hero-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:18px}
+    .stat{padding:18px;border-radius:16px;background:var(--surface2);border:1px solid var(--border)}
+    .stat .num{font-size:1.8rem;font-weight:700;color:var(--text)} .stat .lbl{font-size:.86rem;color:var(--muted)}
+    .section{padding:24px 0 56px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    .card-body{padding:16px}
+    .mini-list{display:grid;gap:12px}.mini-item{display:flex;justify-content:space-between;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
+    .badge{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:.72rem;font-weight:700;background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
+    .badge.text{color:var(--primary)} .badge.image{color:#2563eb}
+    .search-shell{display:grid;grid-template-columns:340px 1fr;gap:22px;padding:18px 0 56px}
+    .search-form{padding:22px;position:sticky;top:92px;height:max-content}
+    .label{display:block;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+    .input,.select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font:inherit}
+    .field{margin-bottom:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+    .product-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+    .product-card img{width:100%;height:290px;object-fit:cover;background:var(--surface3)}
+    .product-card .body{padding:14px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .match{display:inline-flex;padding:6px 10px;border-radius:999px;background:var(--primary);color:#fff;font-size:.74rem;font-weight:700}
+    .fav{border:none;background:transparent;color:var(--muted);font-size:1.2rem;cursor:pointer}.fav.saved{color:var(--danger)}
+    .price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .price-now{font-size:1.35rem;font-weight:700}.price-old{font-size:.9rem;color:var(--muted);text-decoration:line-through}.off{font-size:.72rem;font-weight:700;color:var(--danger);background:color-mix(in srgb,var(--danger) 10%, transparent);padding:3px 8px;border-radius:999px}
+    .links{display:flex;gap:6px;flex-wrap:wrap}.shop{padding:8px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);font-size:.8rem}
+    .results-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .empty,.alert{padding:24px;border-radius:18px;background:var(--surface);border:1px solid var(--border)}
+    .alert.error{color:var(--danger)}
+    .footer{padding:26px 0 50px;color:var(--muted);font-size:.92rem}
+    @media (max-width: 980px){.hero-grid,.search-shell,.cards{grid-template-columns:1fr}.search-form{position:static}.cards{grid-template-columns:1fr 1fr}}
+    @media (max-width: 640px){.nav{height:auto;padding:12px 0}.nav-links{justify-content:flex-end}.cards,.grid{grid-template-columns:1fr}.hero{padding-top:40px}}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a href="/" class="logo">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <span class="logo-text">LUXE</span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+      <a class="nav-link {% if request.path == '/search-page' %}active{% endif %}" href="/search-page">Search</a>
+      <a class="nav-link {% if request.path == '/history-page' %}active{% endif %}" href="/history-page">History</a>
+      <a class="nav-link {% if request.path == '/favorites-page' %}active{% endif %}" href="/favorites-page">Saved</a>
+      <button class="theme-btn" id="themeToggle" type="button">◐</button>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+<footer class="container footer">Visual fashion search with CLIP, FAISS, Flask, and Supabase storage.</footer>
+<script>
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeToggle');
+  let theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  root.setAttribute('data-theme',theme);
+  btn && btn.addEventListener('click',()=>{theme=theme==='dark'?'light':'dark';root.setAttribute('data-theme',theme);});
+})();
+function saveFavorite(imageUrl, price, category, btn){
+  fetch('/favorites', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({image_url:imageUrl, price:price, category:category})})
+    .then(r=>r.json())
+    .then(data=>{ if(!data.error && btn){ btn.classList.add('saved'); btn.textContent='♥'; } });
+}
+function deleteFavorite(id){
+  fetch(`/favorites/${id}`, {method:'DELETE'}).then(()=>window.location.reload());
+}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

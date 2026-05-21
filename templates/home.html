@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}LUXE • Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-grid">
+    <div class="panel hero-copy">
+      <span class="eyebrow">Fashion retrieval • Supabase hosted images • Multi-page app</span>
+      <h1>Search fashion visually, not manually.</h1>
+      <p>Upload a reference image or type a style description, then browse matches powered by your FAISS index and CLIP embeddings. Every result image is served from your Supabase bucket, and every query can be tracked in history.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="/search-page">Start searching</a>
+        <a class="btn btn-secondary" href="/history-page">View history</a>
+      </div>
+    </div>
+    <div class="panel hero-stats">
+      <div class="stat"><div class="num">11k+</div><div class="lbl">Hosted fashion images</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Search modes: text + image</div></div>
+      <div class="stat"><div class="num">FAISS</div><div class="lbl">Fast nearest-neighbor retrieval</div></div>
+      <div class="stat"><div class="num">Supabase</div><div class="lbl">Public storage + database logging</div></div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h2>Recent activity</h2>
+      <p>A quick snapshot from your stored queries and saved products.</p>
+    </div>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-body">
+        <h3>Recent searches</h3>
+        <div class="mini-list">
+          {% if history %}
+            {% for item in history %}
+            <div class="mini-item">
+              <div>
+                <div>{{ item.query_text or item.query_image_name or 'Image search' }}</div>
+                <div style="font-size:.82rem;color:var(--muted);margin-top:4px;">
+                  <span class="badge {{ item.query_type }}">{{ item.query_type }}</span>
+                  {{ item.created_at[:19].replace('T', ' ') if item.created_at else '' }}
+                </div>
+              </div>
+              <div class="badge">{{ item.results_count }} results</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty">No history yet. Run your first search from the Search page.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>Saved items</h3>
+        <div class="mini-list">
+          {% if favorites %}
+            {% for item in favorites %}
+            <div class="mini-item">
+              <div>
+                <div>{{ item.category }}</div>
+                <div style="font-size:.82rem;color:var(--muted);margin-top:4px;">₹{{ item.price }}</div>
+              </div>
+              <button class="btn btn-secondary" style="padding:8px 12px" onclick="deleteFavorite('{{ item.id }}')">Remove</button>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty">No saved products yet. Save one from the search results grid.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>What this app shows now</h3>
+        <div class="mini-list">
+          <div class="mini-item"><div>Dedicated Home, Search, History, and Saved pages</div></div>
+          <div class="mini-item"><div>Supabase-hosted image URLs on every result card</div></div>
+          <div class="mini-item"><div>History and favorites persisted in database tables</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,12 @@
+gradio>=3.50.2
+torch
+transformers>=4.30.0
+pillow
+numpy
+faiss-cpu
+flask
+gunicorn
+flask-cors
+supabase
+python-dotenv
+requests

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}LUXE • History{% endblock %}
+{% block content %}
+<section class="hero" style="padding-bottom:12px;">
+  <span class="eyebrow">Logged queries</span>
+  <h1 style="font-size:clamp(2rem,4vw,3.4rem)">Search history</h1>
+  <p>Every text or image query saved from your search flow appears here.</p>
+</section>
+<section class="section" style="padding-top:8px;">
+  <div class="mini-list">
+    {% if history %}
+      {% for item in history %}
+      <div class="mini-item">
+        <div>
+          <div style="font-weight:700">{{ item.query_text or item.query_image_name or 'Image search' }}</div>
+          <div style="font-size:.84rem;color:var(--muted);margin-top:4px;">
+            <span class="badge {{ item.query_type }}">{{ item.query_type }}</span>
+            {{ item.created_at[:19].replace('T', ' ') if item.created_at else '' }}
+          </div>
+        </div>
+        <div class="badge">{{ item.results_count }} results</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">No search history yet.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

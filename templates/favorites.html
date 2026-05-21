@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}LUXE • Saved{% endblock %}
+{% block content %}
+<section class="hero" style="padding-bottom:12px;">
+  <span class="eyebrow">Saved products</span>
+  <h1 style="font-size:clamp(2rem,4vw,3.4rem)">Favorites</h1>
+  <p>Items you heart from the results grid are stored in Supabase and shown here.</p>
+</section>
+<section class="section" style="padding-top:8px;">
+  {% if favorites %}
+  <div class="grid">
+    {% for item in favorites %}
+    <article class="product-card">
+      <img src="{{ item.product_image_url }}" alt="{{ item.category }}" loading="lazy" onerror="this.src='https://placehold.co/600x800/f3f0ec/8c8b87?text=Image'">
+      <div class="body">
+        <div class="row">
+          <span class="match" style="background:var(--accent)">Saved</span>
+          <button class="fav saved" onclick="deleteFavorite('{{ item.id }}')">♥</button>
+        </div>
+        <div class="price"><span class="price-now">₹{{ item.price }}</span></div>
+        <p style="margin:0">{{ item.category }}</p>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">No favorites yet. Save results from the Search page.</div>
+  {% endif %}
+</section>
+{% endblock %}

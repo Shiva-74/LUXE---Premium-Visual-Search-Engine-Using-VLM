@@ -1,0 +1,507 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Visual Search Engine</title>
+        <style>
+            :root {
+                --primary-color: #3a86ff;
+                --secondary-color: #8338ec;
+                --accent-color: #ff006e;
+                --light-bg: #f8f9fa;
+                --dark-text: #212529;
+                --light-text: #f8f9fa;
+                --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                --transition: all 0.3s ease;
+            }
+            
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            
+            body {
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                min-height: 100vh;
+                padding: 2rem;
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            header {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+            
+            h1 {
+                color: var(--dark-text);
+                font-size: 2.5rem;
+                margin-bottom: 0.5rem;
+                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            }
+            
+            .tagline {
+                color: var(--dark-text);
+                opacity: 0.8;
+                font-size: 1.1rem;
+            }
+            
+            .search-container {
+                background: white;
+                border-radius: 12px;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                margin-bottom: 2rem;
+                transition: var(--transition);
+            }
+            
+            .search-container:hover {
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                transform: translateY(-5px);
+            }
+            
+            .search-tabs {
+                display: flex;
+                margin-bottom: 1.5rem;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .tab {
+                padding: 0.75rem 1.5rem;
+                cursor: pointer;
+                font-weight: 600;
+                color: #777;
+                position: relative;
+                transition: var(--transition);
+            }
+            
+            .tab.active {
+                color: var(--primary-color);
+            }
+            
+            .tab.active::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background-color: var(--primary-color);
+                border-radius: 3px 3px 0 0;
+            }
+            
+            .search-content {
+                padding: 1rem 0;
+            }
+            
+            .search-panel {
+                display: none;
+            }
+            
+            .search-panel.active {
+                display: block;
+                animation: fadeIn 0.5s;
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: var(--dark-text);
+            }
+            
+            input[type="text"], input[type="number"] {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                font-size: 1rem;
+                transition: var(--transition);
+            }
+            
+            input[type="text"]:focus, input[type="number"]:focus {
+                border-color: var(--primary-color);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+            }
+            
+            .file-input-container {
+                position: relative;
+                width: 100%;
+                height: 200px;
+                border: 2px dashed #ccc;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                transition: var(--transition);
+            }
+            
+            .file-input-container:hover {
+                border-color: var(--primary-color);
+                background-color: rgba(58, 134, 255, 0.05);
+            }
+            
+            .file-input-container input[type="file"] {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: pointer;
+            }
+            
+            .file-input-content {
+                text-align: center;
+                pointer-events: none;
+            }
+            
+            .file-icon {
+                font-size: 3rem;
+                color: var(--primary-color);
+                margin-bottom: 1rem;
+            }
+            
+            .search-btn {
+                background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+                color: white;
+                border: none;
+                padding: 0.75rem 2rem;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: var(--transition);
+                display: block;
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            
+            .search-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            }
+            
+            .loading {
+                display: none;
+                text-align: center;
+                padding: 2rem;
+            }
+            
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: 4px solid rgba(0, 0, 0, 0.1);
+                border-left-color: var(--primary-color);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 1rem;
+            }
+            
+            .results-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
+                margin-top: 2rem;
+            }
+            
+            .result-card {
+                background: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: var(--shadow);
+                transition: var(--transition);
+            }
+            
+            .result-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            }
+            
+            .result-image {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+            }
+            
+            .result-info {
+                padding: 1rem;
+            }
+            
+            .similarity-score {
+                display: inline-block;
+                background-color: var(--primary-color);
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }
+            
+            .result-path {
+                font-size: 0.85rem;
+                color: #777;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            @media (max-width: 768px) {
+                .container {
+                    padding: 1rem;
+                }
+                
+                h1 {
+                    font-size: 2rem;
+                }
+                
+                .search-container {
+                    padding: 1.5rem;
+                }
+                
+                .tab {
+                    padding: 0.5rem 1rem;
+                    font-size: 0.9rem;
+                }
+                
+                .results-container {
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Visual Search Engine</h1>
+                <p class="tagline">Find similar images using text or image queries</p>
+            </header>
+            
+            <div class="search-container">
+                <div class="search-tabs">
+                    <div class="tab active" data-tab="text">Text Search</div>
+                    <div class="tab" data-tab="image">Image Search</div>
+                </div>
+                
+                <div class="search-content">
+                    <div class="search-panel active" id="text-panel">
+                        <div class="form-group">
+                            <label for="text-query">Describe what you're looking for:</label>
+                            <input type="text" id="text-query" placeholder="E.g., 'A red dress with floral pattern'">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="text-results">Number of results:</label>
+                            <input type="number" id="text-results" value="5" min="1" max="50">
+                        </div>
+                        
+                        <button class="search-btn" id="text-search-btn">Search</button>
+                    </div>
+                    
+                    <div class="search-panel" id="image-panel">
+                        <div class="form-group">
+                            <label>Upload an image to find similar ones:</label>
+                            <div class="file-input-container">
+                                <input type="file" id="image-query" accept="image/*">
+                                <div class="file-input-content">
+                                    <div class="file-icon">📷</div>
+                                    <p>Drag & drop an image here or click to browse</p>
+                                    <p id="selected-file" style="margin-top: 10px; font-size: 0.9rem;"></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="image-results">Number of results:</label>
+                            <input type="number" id="image-results" value="5" min="1" max="50">
+                        </div>
+                        
+                        <button class="search-btn" id="image-search-btn">Search</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Searching for the most relevant results...</p>
+            </div>
+            
+            <div class="results-container" id="results">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+        
+        <script>
+            // Tab switching functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Hide all panels
+                    document.querySelectorAll('.search-panel').forEach(panel => panel.classList.remove('active'));
+                    // Show the corresponding panel
+                    document.getElementById(`${tab.dataset.tab}-panel`).classList.add('active');
+                });
+            });
+            
+            // Display selected filename
+            document.getElementById('image-query').addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'No file selected';
+                document.getElementById('selected-file').textContent = fileName;
+            });
+            
+            // Text search functionality
+            document.getElementById('text-search-btn').addEventListener('click', function() {
+                const query = document.getElementById('text-query').value;
+                const numResults = document.getElementById('text-results').value;
+                
+                if (!query) {
+                    alert('Please enter a search query');
+                    return;
+                }
+                
+                // Show loading indicator
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('results').innerHTML = '';
+                
+                const formData = new FormData();
+                formData.append('query_type', 'text');
+                formData.append('text_query', query);
+                formData.append('k', numResults);
+                
+                fetch('/search', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data.error) {
+                        document.getElementById('results').innerHTML = `<p style="color: red;">${data.error}</p>`;
+                        return;
+                    }
+                    
+                    if (data.results.length === 0) {
+                        document.getElementById('results').innerHTML = '<p>No results found.</p>';
+                        return;
+                    }
+                    
+                    displayResults(data.results);
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                });
+            });
+            
+            // Image search functionality
+            document.getElementById('image-search-btn').addEventListener('click', function() {
+                const fileInput = document.getElementById('image-query');
+                const numResults = document.getElementById('image-results').value;
+                
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                // Show loading indicator
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('results').innerHTML = '';
+                
+                const formData = new FormData();
+                formData.append('query_type', 'image');
+                formData.append('image_query', fileInput.files[0]);
+                formData.append('k', numResults);
+                
+                fetch('/search', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data.error) {
+                        document.getElementById('results').innerHTML = `<p style="color: red;">${data.error}</p>`;
+                        return;
+                    }
+                    
+                    if (data.results.length === 0) {
+                        document.getElementById('results').innerHTML = '<p>No results found.</p>';
+                        return;
+                    }
+                    
+                    displayResults(data.results);
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                });
+            });
+            
+            // Display results in cards
+            function displayResults(results) {
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = '';
+                
+                results.forEach(result => {
+                    const card = document.createElement('div');
+                    card.className = 'result-card';
+                    
+                    const img = document.createElement('img');
+                    img.src = result.image_url;
+                    img.className = 'result-image';
+                    img.alt = 'Search result';
+                    
+                    const info = document.createElement('div');
+                    info.className = 'result-info';
+                    
+                    const similarity = document.createElement('div');
+                    similarity.className = 'similarity-score';
+                    similarity.textContent = `Similarity: ${result.similarity}`;
+                    
+                    const path = document.createElement('div');
+                    path.className = 'result-path';
+                    path.title = result.original_path;
+                    path.textContent = result.original_path;
+                    
+                    info.appendChild(similarity);
+                    info.appendChild(path);
+                    
+                    card.appendChild(img);
+                    card.appendChild(info);
+                    
+                    resultsContainer.appendChild(card);
+                });
+            }
+        </script>
+    </body>
+    </html>
+    
