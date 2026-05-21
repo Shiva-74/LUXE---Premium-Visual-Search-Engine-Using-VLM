@@ -1,12 +1,9 @@
-gradio>=3.50.2
+openai 
 torch
 transformers>=4.30.0
 pillow
 numpy
 faiss-cpu
-flask
-gunicorn
-flask-cors
-supabase
-python-dotenv
-requests
+transformers
+pytorch
+numpy
